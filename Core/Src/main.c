@@ -132,12 +132,7 @@ int main(void)
   wchar_t pot2ValueBuff[32];
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)potvalue, 2);
 
-
-
   lcd_init();
-
-
-
 
 
   while (1)
@@ -153,8 +148,13 @@ int main(void)
 
 	  hagl_clear_screen();
 
-	  hagl_put_text(pot1ValueBuff, 30, 30, YELLOW, font6x9);
-	  hagl_put_text(pot2ValueBuff, 30, 50, YELLOW, font6x9);
+	  hagl_draw_rounded_rectangle(30, 10, 130, 43, 10, YELLOW);
+	  hagl_draw_rounded_rectangle(30, 60, 130, 93, 10, YELLOW);
+	  hagl_put_text(L"Potentiometer 1", 37, 17, YELLOW, font6x9);
+	  hagl_put_text(pot1ValueBuff, 64, 30, YELLOW, font6x9);
+	  hagl_put_text(L"Potentiometer 2", 37, 67, YELLOW, font6x9);
+	  hagl_put_text(pot2ValueBuff, 64, 80, YELLOW, font6x9);
+	  hagl_put_text(L"github.com/kpatrykEIT", 20, 110, BLUE, font6x9);
 
 
 	  lcd_copy();
