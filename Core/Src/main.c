@@ -128,18 +128,37 @@ int main(void)
   HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
 
   volatile static uint16_t potvalue[2];
+  wchar_t pot1ValueBuff[32];
+  wchar_t pot2ValueBuff[32];
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)potvalue, 2);
 
-  lcd_init();
-  for (int i = 0; i < 8; i++) {
-    hagl_draw_rounded_rectangle(2+i, 2+i, 158-i, 126-i, 8-i, rgb565(0, 0, i*16));
-  }
-  hagl_put_text(L"Test wyświetlacza", 20, 30, YELLOW, font6x9);
 
-  lcd_copy();
+
+  lcd_init();
+
+
+
+
 
   while (1)
   {
+	  float voltage_pot1 = 3.3f * potvalue[0] / 4096.0f;
+	  float voltage_pot2 = 3.3f * potvalue[1] / 4096.0f;
+	  int v1 = (int)(voltage_pot1 * 100);
+	  int v2 = (int)(voltage_pot2 * 100);
+
+	  swprintf(pot1ValueBuff, 32, L"%d.%02dV", v1/100, v1%100);
+	  swprintf(pot2ValueBuff, 32, L"%d.%02dV", v2/100, v2%100);
+
+
+	  hagl_clear_screen();
+
+	  hagl_put_text(pot1ValueBuff, 30, 30, YELLOW, font6x9);
+	  hagl_put_text(pot2ValueBuff, 30, 50, YELLOW, font6x9);
+
+
+	  lcd_copy();
+
 
 
     /* USER CODE END WHILE */
