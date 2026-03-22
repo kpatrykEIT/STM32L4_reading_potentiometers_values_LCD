@@ -18,11 +18,19 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
+#include "spi.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include "hagl.h"
+#include "font6x9.h"
+#include "rgb565.h"
+#include "lcd.h"
 
 /* USER CODE END Includes */
 
@@ -55,6 +63,25 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+	if(hspi == &hspi2)
+	{
+		lcd_transfer_done();
+	}
+}
+
+int __io_putchar(int ch)
+{
+	if(ch == '\n')
+	{
+		uint8_t ch2 = '\r';
+		HAL_UART_Transmit(&huart2, &ch2, 1, HAL_MAX_DELAY);
+	}
+
+	HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+	return 1;
+}
 
 /* USER CODE END 0 */
 
@@ -87,15 +114,34 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
+  MX_ADC1_Init();
+  MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+
+  volatile static uint16_t potvalue[2];
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)potvalue, 2);
+
+  lcd_init();
+  for (int i = 0; i < 8; i++) {
+    hagl_draw_rounded_rectangle(2+i, 2+i, 158-i, 126-i, 8-i, rgb565(0, 0, i*16));
+  }
+  hagl_put_text(L"Test wyświetlacza", 20, 30, YELLOW, font6x9);
+
+  lcd_copy();
+
   while (1)
   {
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
